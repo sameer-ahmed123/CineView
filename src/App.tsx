@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import MoviePage from "./pages/MoviePage";
 import AuthPage from "./pages/AuthPage";
 import SignupPage from "./pages/SignupPage";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="*" element={<div>404 Not Found</div>} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </BrowserRouter>
   );

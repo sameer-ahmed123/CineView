@@ -21,7 +21,7 @@ function NavBar() {
             {user ? (
               <>
                 {" "}
-                <a href="/auth">
+                <a href="/profile">
                   <img
                     style={{ width: 40, height: 40, borderRadius: 50 }}
                     src={user.photoURL || default_img}
