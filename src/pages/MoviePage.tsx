@@ -2,17 +2,20 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { fetchMovieById, fetchMovieVideos, Movie } from "../api/Api";
 import { ReviewForm } from "../components/ReviewForm";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
+import { useAuth } from "../hooks/useAuth";
 
 import NavBar from "../components/Navbar";
 import "./MoviePage.css";
 
 const MoviePage: React.FC = () => {
+  const { user } = useAuth();
+  const default_img =
+    "https://www.pngall.com/wp-content/uploads/5/Avatar-Profile-PNG-Clipart.png";
   const { id } = useParams<{ id: string }>();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [video, setVideo] = useState<any[]>([]);
-
   const [reviews, setReviews] = useState<any[]>([]);
   const [isLoadingReviews, setIsLoadingReviews] = useState<boolean>(true);
 
@@ -92,21 +95,69 @@ const MoviePage: React.FC = () => {
           </div>
         </div>
       </section>
-      <section>
+      <section className="Review-section">
         <ReviewForm movieId={String(id)} />
       </section>
-      <section>
+      <section className="reviews-section">
         <h2>User Reviews</h2>
         {isLoadingReviews ? (
           <p>Loading reviews...</p>
         ) : reviews.length === 0 ? (
           <p>No reviews yet. Be the first to review!</p>
         ) : (
-          <ul>
+          <ul className="review-list">
             {reviews.map((review, index) => (
-              <li key={index}>
-                <strong>{review.username}</strong> rated it {review.rating}/10
+              <li className="review-item" key={index}>
+                <div className="review-strong">
+                  <img
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 50,
+                      display: "inline-block",
+                    }}
+                    src={review?.avatar || default_img}
+                    alt=""
+                  />{" "}
+                  <p>
+                    <span style={{ fontSize: 24, fontWeight: 600 }}>
+                      {review.username}
+                    </span>{" "}
+                    rated it {review.rating}/10⭐{" "}
+                  </p>
+                </div>{" "}
                 <p>{review.review}</p>
+                {/* Only show if current user is the author */}
+                {user?.uid === review.userId && (
+                  <div style={{ marginTop: "0.5rem" }}>
+                    <>
+                      <button
+                        onClick={async () => {
+                          if (
+                            confirm(
+                              "Are you sure you want to delete this review?"
+                            )
+                          ) {
+                            await deleteDoc(
+                              doc(
+                                db,
+                                "reviews",
+                                id!,
+                                "userReviews",
+                                review.userId
+                              )
+                            );
+                            setReviews((prev) =>
+                              prev.filter((r) => r.userId !== review.userId)
+                            );
+                          }
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </>
+                  </div>
+                )}
               </li>
             ))}
           </ul>

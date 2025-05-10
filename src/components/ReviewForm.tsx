@@ -3,6 +3,7 @@ import { useState } from "react";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useAuth } from "../hooks/useAuth";
+import "./ReviewForm.css";
 
 interface ReviewFormProps {
   movieId: string;
@@ -23,6 +24,7 @@ export function ReviewForm({ movieId }: ReviewFormProps) {
         review: review,
         rating: rating,
         userId: user.uid,
+        avatar:user.photoURL,
         timestamp: new Date(),
       });
       alert("Review submitted!");
@@ -34,7 +36,7 @@ export function ReviewForm({ movieId }: ReviewFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="review-form">
       <textarea
         value={review}
         onChange={(e) => setReview(e.target.value)}

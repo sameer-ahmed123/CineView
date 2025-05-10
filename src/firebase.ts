@@ -1,5 +1,5 @@
 // Import the functions you need from the SDKs you need
-const FIREBASE_API_KEY = import.meta.env.FIREBASE_API_KEY
+const FIREBASE_API_KEY = import.meta.env.VITE_FIREBASE_API_KEY
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth/web-extension";
@@ -10,7 +10,7 @@ import { getFirestore } from "firebase/firestore";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: FIREBASE_API_KEY,
+  apiKey: `${FIREBASE_API_KEY}`,
   authDomain: "cineview-f70fd.firebaseapp.com",
   projectId: "cineview-f70fd",
   storageBucket: "cineview-f70fd.firebasestorage.app",
