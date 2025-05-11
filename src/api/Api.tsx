@@ -24,6 +24,8 @@ export interface Movie {
   tagline: string;
   genres: genres[];
   languages: languages[];
+  original_language: string;
+  adult: boolean;
 }
 
 export const fetchPopularMovies = async (): Promise<Movie[]> => {
@@ -41,10 +43,42 @@ export const searchMovies = async (query: string): Promise<Movie[]> => {
   const res = await fetch(
     `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(
       query
-    )}`
+    )}&include_adult=false`
   );
   const data = await res.json();
-  return data.results;
+  const nsfwKeywords = [
+    "pussy",
+    "rubbing",
+    "sex",
+    "ass",
+    "nude",
+    "nudity",
+    "hentai",
+    "softcore",
+    "xxx",
+    "fetish",
+    "mistress",
+    "incest",
+    "porno",
+    "adult",
+    "淫",
+    "乳",
+    "裸",
+    "淫乱",
+    "人妻",
+  ];
+
+  console.log(data.results);
+  const filteredResults = data.results.filter((movie: Movie) => {
+    const text = `${movie.title} ${movie.overview} `.toLocaleLowerCase();
+    return (
+      !movie.adult && !nsfwKeywords.some((keyword) => text.includes(keyword))
+    );
+  });
+  console.log(filteredResults);
+
+  return filteredResults;
+  // return data.results;
 };
 
 export const fetchMovieVideos = async (movieId: string) => {

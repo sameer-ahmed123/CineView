@@ -8,6 +8,7 @@ const signup = async (email: string, password: string) => {
       email,
       password
     );
+    console.log(userCredential)
     return userCredential;
   } catch (error) {
     console.error("Error signing up:", error);

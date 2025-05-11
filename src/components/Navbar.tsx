@@ -1,6 +1,7 @@
 import "./Navbar.css";
 import Search from "./Search";
 import { useAuth } from "../hooks/useAuth";
+import { Logout } from "./Logout";
 
 function NavBar() {
   const { user } = useAuth();
@@ -28,6 +29,7 @@ function NavBar() {
                     alt=""
                   />
                 </a>
+                <Logout/>
               </>
             ) : (
               <>
