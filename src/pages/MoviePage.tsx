@@ -2,10 +2,10 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { fetchMovieById, fetchMovieVideos, Movie } from "../api/Api";
 import { ReviewForm } from "../components/ReviewForm";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import { useAuth } from "../hooks/useAuth";
-
+import Skeleton from "react-loading-skeleton";
 import NavBar from "../components/Navbar";
 import "./MoviePage.css";
 
@@ -24,19 +24,34 @@ const MoviePage: React.FC = () => {
       fetchMovieById(id).then(setMovie);
       fetchMovieVideos(id).then(setVideo);
 
-      const fetchReviews = async () => {
-        const reviewRef = collection(db, "reviews", id, "userReviews");
-        const snapshot = await getDocs(reviewRef);
+      const reviewRef = collection(db, "reviews", id, "userReviews");
+      const unsubscribe = onSnapshot(reviewRef, (snapshot) => {
         const reviewsData = snapshot.docs.map((doc) => doc.data());
         setReviews(reviewsData);
         setIsLoadingReviews(false);
-      };
+      });
 
-      fetchReviews();
+      return () => unsubscribe();
     }
   }, [id]);
 
-  if (!movie) return <p>Loading...</p>;
+  if (!movie) {
+    return (
+      <section className="movie-detail">
+        <h1>
+          <Skeleton width={200} />
+        </h1>
+        <div className="movie-main">
+          <div className="movie-main_left">
+            <Skeleton height={450} width={300} />
+          </div>
+          <div className="movie-main_right">
+            <Skeleton height={300} width={500} />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <>
@@ -74,11 +89,6 @@ const MoviePage: React.FC = () => {
             </div>
           </div>
           <div className="movie-main_right">
-            {/* <img
-              className="movie_backdrop"
-              src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-              alt={movie.title}
-            /> */}
             {video.length > 0 ? (
               <iframe
                 className="movie_backdrop"
@@ -101,7 +111,17 @@ const MoviePage: React.FC = () => {
       <section className="reviews-section">
         <h2>User Reviews</h2>
         {isLoadingReviews ? (
-          <p>Loading reviews...</p>
+          <ul className="review-list">
+            {[...Array(3)].map((_, i) => (
+              <li key={i} className="review-item">
+                <div className="review-strong">
+                  <Skeleton circle width={30} height={30} />
+                  <Skeleton width={200} style={{ marginLeft: 10 }} />
+                </div>
+                <Skeleton count={2} />
+              </li>
+            ))}
+          </ul>
         ) : reviews.length === 0 ? (
           <p>No reviews yet. Be the first to review!</p>
         ) : (

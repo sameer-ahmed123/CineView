@@ -38,6 +38,17 @@
   font-size: 24px;
 }
 
+@media screen and (max-width: 821px) {
+  .navBar {
+    flex-direction: column;
+  }
+  .navList {
+    padding: 0;
+    margin: 0;
+  }
+}
+
+
 @media screen and (max-width: 541px) {
   .navBar {
     flex-direction: column;
@@ -61,8 +72,10 @@
 @media screen and (max-width: 375px) {
   .navBar {
     flex-direction: column;
+    /* height: 250px; */
   }
   .navList {
+    /* flex-direction: column; */
     padding: 0;
     margin: 0;
   }

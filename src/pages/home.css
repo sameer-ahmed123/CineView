@@ -14,6 +14,34 @@ h2 {
   user-select: none;
 }
 
+.pagination-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+  gap: 1rem;
+}
+
+.pagination-buttons button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #222;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.pagination-buttons button:hover {
+  background-color: #444;
+}
+
+.pagination-buttons button:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
 @media screen and (max-width: 541px) {
   h2 {
     text-align: center;

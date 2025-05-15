@@ -28,10 +28,13 @@ export interface Movie {
   adult: boolean;
 }
 
-export const fetchPopularMovies = async (): Promise<Movie[]> => {
-  const res = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
+export const fetchPopularMovies = async (page = 1): Promise<Movie[]> => {
+  const res = await fetch(
+    `${BASE_URL}/movie/popular?api_key=${API_KEY}&page=${page}`
+  );
   const data = await res.json();
-  return data.results;
+  // return data.results;
+  return data.results.slice(0, 18);
 };
 
 export const fetchMovieById = async (id: string): Promise<Movie> => {
@@ -39,11 +42,14 @@ export const fetchMovieById = async (id: string): Promise<Movie> => {
   return await res.json();
 };
 
-export const searchMovies = async (query: string): Promise<Movie[]> => {
+export const searchMovies = async (
+  query: string,
+  page = 1
+): Promise<Movie[]> => {
   const res = await fetch(
     `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(
       query
-    )}&include_adult=false`
+    )}&page=${page}&include_adult=false`
   );
   const data = await res.json();
   const nsfwKeywords = [
@@ -77,7 +83,7 @@ export const searchMovies = async (query: string): Promise<Movie[]> => {
   });
   console.log(filteredResults);
 
-  return filteredResults;
+  return filteredResults.slice(0, 18);
   // return data.results;
 };
 

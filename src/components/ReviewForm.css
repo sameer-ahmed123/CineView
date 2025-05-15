@@ -20,7 +20,7 @@
     font-family: inherit;
   }
   
-  .review-form input[type="number"] {
+  .review-form select {
     width: 150px;
     padding: 10px;
     border-radius: 8px;
@@ -45,3 +45,11 @@
     background-color: #333;
   }
   
+
+  
+.error {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 4px;
+  text-align: center;
+}

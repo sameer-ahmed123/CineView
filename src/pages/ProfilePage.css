@@ -1,35 +1,105 @@
-.profile-page {
-  padding: 20px;
+a{
+  text-decoration: none;
+  color: black;
 }
 
-.movie-info {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.movie-poster {
-  width: 100px;
-  height: 150px;
-  margin-right: 20px;
-}
-
-.movie-details {
+.profile-list-view {
   display: flex;
   flex-direction: column;
+  gap: 20px;
+  padding: 0 16px;
 }
 
-.movie-details h3 {
-  font-size: 20px;
-  font-weight: bold;
+/* Movie Card */
+.profile-movie-card {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  cursor: pointer;
 }
 
-.movie-details p {
-  font-size: 16px;
-  margin: 10px 0;
+.profile-movie-card:hover {
+  transform: scale(1.01);
 }
 
-.movie-details small {
+.profile-movie-poster {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.profile-movie-details {
+  padding: 16px;
+}
+
+.profile-movie-details h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.profile-movie-details p {
   font-size: 14px;
-  color: #777;
+  margin: 4px 0;
+}
+
+.profile-movie-review {
+  font-style: italic;
+  color: #555;
+  margin-top: 8px;
+}
+
+/* Medium phones: ≥ 400px */
+@media (min-width: 400px) {
+  .profile-movie-details h3 {
+    font-size: 20px;
+  }
+
+  .profile-movie-details p {
+    font-size: 15px;
+  }
+}
+
+/* Tablets and larger phones in landscape: ≥ 600px */
+@media (min-width: 600px) {
+  .profile-movie-card {
+    flex-direction: row;
+  }
+
+  .profile-movie-poster {
+    width: 160px;
+    height: 240px;
+  }
+
+  .profile-movie-details {
+    flex: 1;
+    padding: 16px 20px;
+  }
+
+  .profile-movie-details h3 {
+    font-size: 22px;
+  }
+
+  .profile-movie-details p {
+    font-size: 16px;
+  }
+}
+
+/* Tablets landscape or small laptops: ≥ 768px */
+@media (min-width: 768px) {
+  .profile-list-view {
+    padding: 0 24px;
+  }
+
+  .profile-movie-poster {
+    width: 180px;
+    height: 260px;
+  }
+
+  .profile-movie-details h3 {
+    font-size: 24px;
+  }
 }

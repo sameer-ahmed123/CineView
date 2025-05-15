@@ -4,9 +4,19 @@ import "./Search.css";
 
 function Search() {
   const [query, setQuery] = useState("");
+  const [error, setError] = useState("");
   const navgate = useNavigate();
+
   const handelSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const trimQuery = query.trim();
+
+    if (trimQuery.length < 2) {
+      setError("please enter atleast 2 characters");
+      return;
+    }
+    setError("");
+
     navgate(`/?search=${encodeURIComponent(query)}`);
   };
   return (
@@ -20,6 +30,7 @@ function Search() {
           onChange={(e) => setQuery(e.target.value)}
         />
       </form>
+      {error && <p className="search-error">{error}</p>}
     </>
   );
 }

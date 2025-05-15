@@ -29,7 +29,6 @@ function NavBar() {
                     alt=""
                   />
                 </a>
-                <Logout/>
               </>
             ) : (
               <>
@@ -39,6 +38,7 @@ function NavBar() {
               </>
             )}
           </li>
+          <li>{user ? <Logout /> : <></>}</li>
         </ul>
       </nav>
     </>

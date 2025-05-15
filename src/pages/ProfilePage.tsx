@@ -10,6 +10,9 @@ import {
 } from "firebase/firestore";
 import { fetchMovieById } from "../api/Api";
 import NavBar from "../components/Navbar";
+import { Link } from "react-router-dom";
+import "./ProfilePage.css";
+import Skeleton from "react-loading-skeleton";
 
 interface MovieReview {
   movieId: string;
@@ -45,6 +48,7 @@ const ProfilePage: React.FC = () => {
             reviewData: docSnap.data(),
             movieDetails,
           });
+          console.log(movieDetails);
         }
         console.log(reviewData);
         setReviews(reviewData);
@@ -58,7 +62,32 @@ const ProfilePage: React.FC = () => {
     fetchUserReviewedMovies();
   }, [user]);
 
-  if (loading) return <p className="text-center mt-8">Loading...</p>;
+  if (loading)
+    return (
+      <>
+        <NavBar />
+        <section className="max-w-5xl mx-auto p-4">
+          <h1 className="text-3xl font-bold mb-6 text-center">
+            Movies You've Reviewed
+          </h1>
+          <div className="profile-list-view">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="profile-movie-card">
+                <Skeleton width={300} height={250} />
+                <div
+                  className="profile-movie-details"
+                  style={{ marginLeft: 20 }}
+                >
+                  <Skeleton width={200} height={30} />
+                  <Skeleton width={100} />
+                  <Skeleton count={2} width={250} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </>
+    );
 
   return (
     <>
@@ -72,32 +101,29 @@ const ProfilePage: React.FC = () => {
             You haven't reviewed any movies yet.
           </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="profile-list-view">
             {reviews.map(({ movieDetails, reviewData }) => (
-              <div
-                key={movieDetails.id}
-                className="bg-white shadow-lg rounded-2xl overflow-hidden transition-transform hover:scale-105"
-              >
-                <img
-                  src={`https://image.tmdb.org/t/p/w300${movieDetails.poster_path}`}
-                  alt={movieDetails.title}
-                  className="w-full h-72 object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="text-xl font-semibold mb-2">
-                    {movieDetails.title}
-                  </h3>
-                  <p className="text-sm text-gray-700">
-                    <strong>Rating:</strong>{" "}
-                    {reviewData.rating ?? "No rating given"}
-                  </p>
-                  {reviewData.review && (
-                    <p className="mt-2 text-gray-600 italic">
-                      “{reviewData.review}”
+              <Link to={`/movie/${movieDetails.id}`} key={movieDetails.id}>
+                <div className="profile-movie-card">
+                  <img
+                    src={`https://image.tmdb.org/t/p/w300${movieDetails.poster_path}`}
+                    alt={movieDetails.title}
+                    className="profile-movie-poster"
+                  />
+                  <div className="profile-movie-details">
+                    <h3>{movieDetails.title}</h3>
+                    <p>
+                      <strong>Rating:</strong>{" "}
+                      {reviewData.rating ?? "No rating given"}
                     </p>
-                  )}
+                    {reviewData.review && (
+                      <p className="profile-movie-review">
+                        “{reviewData.review}”
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
