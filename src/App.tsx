@@ -5,6 +5,7 @@ import AuthPage from "./pages/AuthPage";
 import SignupPage from "./pages/SignupPage";
 import ProfilePage from "./pages/ProfilePage";
 
+
 function App() {
   return (
     <BrowserRouter>
