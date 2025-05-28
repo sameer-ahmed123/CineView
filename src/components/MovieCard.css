@@ -1,57 +1,152 @@
+*{
+  font-family: 'Inter', sans-serif;
+
+}
 .movie-card {
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
   text-decoration: none;
-  color: black;
-  font-size: 14px;
+  color: inherit;
+  transition: transform 0.3s ease;
 }
 
-.movie-card-content::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0);
-  border-radius: 20px;
-  transition: all ease-in 0.2s;
+.movie-card:hover {
+  transform: scale(1.03);
 }
-.movie-card-content:hover::before {
-  background-color: rgba(171, 171, 171, 53%);
-}
+
 .movie-card-content {
-  height: 263px;
-  width: 177px;
-  border-radius: 20px;
   position: relative;
+  width: 100%;
+  height: 360px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .movie-card-image {
-  height: 263px;
-  width: 177px;
-  border-radius: 20px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  display: block;
+  border-radius: 16px;
 }
 
-.movie-card-voteaverage {
+/* Hover Overlay */
+.movie-card-overlay {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 3.5rem;
-  font-weight: 600;
-  color: #fff;
+  inset: 0;
+  background: rgb(12, 14, 28);
+  color: #ffffff;
   opacity: 0;
-  transition: all ease-in 0.2s;
-}
-.movie-card-content:hover .movie-card-voteaverage {
-  opacity: 1;
-  transition: all ease-in 0.2s;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.3s ease;
 }
 
-.movie-card-title {
-  text-align: center;
+.movie-card-content:hover .movie-card-overlay {
+  opacity: 1;
+}
+
+.overlay-backdrop {
+  height: 150px;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 1px solid #333;
+}
+
+/* Text info */
+.overlay-info {
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex: 1;
+}
+
+.overlay-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: #ffffff;
+}
+
+.overlay-rating,
+.overlay-date {
+  font-size: 0.95rem;
+  margin-bottom: 0.3rem;
+}
+.overlay-description {
+  font-size: 0.85rem;
+  color: #ccc;
+  line-height: 1.25;
+}
+.overlay-meta {
+  display: flex;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: #ccc;
+}
+.image-bottom-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to top, rgba(15, 15, 15, 0.95), rgba(15, 15, 15, 0),rgba(15, 15, 15, 0));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+.overlay-meta {
+  margin-bottom: 0.5rem;
+}
+.meta-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+.rating {
+  color: #5eead4;
+  font-weight: bold;
+  font-size: 0.75rem;
+
+}
+.hd-badge {
+  display: inline-block;
+  background-color: #ffffff22;
+  color: #ccc;
+  font-size: 0.65rem;
+  font-weight: bold;
+  padding: 2px 2px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.overlay-backdrop {
+  position: relative;
+  height: 150px;
+  border-bottom: 1px solid #333;
+  overflow: hidden;
+}
+
+/* Actual backdrop image */
+.backdrop-image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+/* Gradient overlay over backdrop */
+.backdrop-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(12, 14, 28, 0.2), rgba(12, 14, 28, 0.6));
+  z-index: 1;
 }

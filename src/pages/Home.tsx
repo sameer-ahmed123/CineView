@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchPopularMovies, searchMovies, Movie } from "../api/Api";
 import { useSearchParams } from "react-router-dom";
 import MovieCard from "../components/MovieCard";
@@ -6,20 +6,35 @@ import "./home.css";
 import NavBar from "../components/Navbar";
 import Skeleton from "react-loading-skeleton";
 
+const categoryList = [
+  "Popular", "Comedy", "Action", "Drama", "Horror",
+  "Romance", "Crime", "Sci-Fi", "Adventure", "Animation",
+  "Romance", "Crime", "Sci-Fi", "Adventure", "Animation",
+  "Romance", "Crime", "Sci-Fi", "Adventure", "Animation"
+];
+
 const Home: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setIsloading] = useState(true);
-  const [searchParams,setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("search") || "";
-  const page = parseInt(searchParams.get("page") || "1",10);
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const [activeCategory, setActiveCategory] = useState("Popular");
+
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+
+  // Dragging state
+  const isDown = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
 
   useEffect(() => {
     const fetch = async () => {
       setIsloading(true);
       const data =
-        query.trim() === "" // if no query just get regular page result
-          ? await fetchPopularMovies(page) // regular
-          : await searchMovies(query, page); // search 
+        query.trim() === ""
+          ? await fetchPopularMovies(page)
+          : await searchMovies(query, page);
       setMovies(data);
       setIsloading(false);
     };
@@ -33,12 +48,72 @@ const Home: React.FC = () => {
   };
 
   const handleNext = () => updatePage(page + 1);
-  const handlePrevious = () => updatePage(Math.max(1, page - 1));
+
+  const scrollCategory = (direction: "left" | "right") => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = direction === "left" ? -200 : 200;
+      categoryScrollRef.current.scrollBy({
+        left: scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // Mouse drag handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!categoryScrollRef.current) return;
+    isDown.current = true;
+    startX.current = e.pageX - categoryScrollRef.current.offsetLeft;
+    scrollLeft.current = categoryScrollRef.current.scrollLeft;
+  };
+
+  const handleMouseLeave = () => {
+    isDown.current = false;
+  };
+
+  const handleMouseUp = () => {
+    isDown.current = false;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDown.current || !categoryScrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - categoryScrollRef.current.offsetLeft;
+    const walk = (x - startX.current) * 1.5; // scroll speed
+    categoryScrollRef.current.scrollLeft = scrollLeft.current - walk;
+  };
+
   return (
     <>
       <NavBar />
-      <div>
-        <h2>Popular</h2>
+      <div className="home-container">
+        <h2>Movies</h2>
+
+        <div className="category-wrapper">
+          <button className="scroll-btn left" onClick={() => scrollCategory("left")}>◀</button>
+
+          <div
+            className="category-bar"
+            ref={categoryScrollRef}
+            onMouseDown={handleMouseDown}
+            onMouseLeave={handleMouseLeave}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+          >
+            {categoryList.map((genre) => (
+              <button
+                key={genre}
+                className={`category-tab ${activeCategory === genre ? "active" : ""}`}
+                onClick={() => setActiveCategory(genre)}
+              >
+                {genre}
+              </button>
+            ))}
+          </div>
+
+          <button className="scroll-btn right" onClick={() => scrollCategory("right")}>▶</button>
+        </div>
+
         <div className="movie-grid">
           {loading
             ? [...Array(10)].map((_, i) => (
@@ -48,13 +123,10 @@ const Home: React.FC = () => {
                 </div>
               ))
             : movies.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
-        </div>{" "}
+        </div>
+
         <div className="pagination-buttons">
-          <button onClick={handlePrevious} disabled={page === 1}>
-            ◀ Prev
-          </button>
-          <span>Page {page}</span>
-          <button onClick={handleNext}>Next ▶</button>
+          <button onClick={handleNext}>Load More</button>
         </div>
       </div>
     </>
