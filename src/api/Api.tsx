@@ -34,7 +34,7 @@ export const fetchPopularMovies = async (page = 1): Promise<Movie[]> => {
   );
   const data = await res.json();
   // return data.results;
-  return data.results.slice(0, 18);
+  return data.results.slice(0, 30);
 };
 
 export const fetchMovieById = async (id: string): Promise<Movie> => {
