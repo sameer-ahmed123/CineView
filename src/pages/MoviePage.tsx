@@ -10,12 +10,12 @@ import { db } from "../firebase";
 
 const MoviePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const default_img = "https://www.pngall.com/wp-content/uploads/5/Avatar-Profile-PNG-Clipart.png";
+  const default_img = "https://www.vectorstock.com/royalty-free-vector/default-profile-picture-avatar-user-icon-vector-46389216";
   const [movie, setMovie] = useState<Movie | null>(null);
   const [video, setVideo] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
-  const trailers = video.filter(v => v.type === "Trailer");
-  const clips = video.filter(v => v.type === "Clip");
+  // const trailers = video.filter(v => v.type === "Trailer");
+  // const clips = video.filter(v => v.type === "Clip");
 
 
 useEffect(() => {
