@@ -1,188 +1,130 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { fetchMovieById, fetchMovieVideos, Movie } from "../api/Api";
-import { ReviewForm } from "../components/ReviewForm";
-import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
-import { db } from "../firebase";
-import { useAuth } from "../hooks/useAuth";
-import Skeleton from "react-loading-skeleton";
 import NavBar from "../components/Navbar";
+import { ReviewForm } from "../components/ReviewForm";
+import Skeleton from "react-loading-skeleton";
 import "./MoviePage.css";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
 
 const MoviePage: React.FC = () => {
-  const { user } = useAuth();
-  const default_img =
-    "https://www.pngall.com/wp-content/uploads/5/Avatar-Profile-PNG-Clipart.png";
   const { id } = useParams<{ id: string }>();
+  const default_img = "https://www.pngall.com/wp-content/uploads/5/Avatar-Profile-PNG-Clipart.png";
   const [movie, setMovie] = useState<Movie | null>(null);
   const [video, setVideo] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
-  const [isLoadingReviews, setIsLoadingReviews] = useState<boolean>(true);
+  const trailers = video.filter(v => v.type === "Trailer");
+  const clips = video.filter(v => v.type === "Clip");
 
-  useEffect(() => {
-    if (id) {
-      fetchMovieById(id).then(setMovie);
-      fetchMovieVideos(id).then(setVideo);
 
-      const reviewRef = collection(db, "reviews", id, "userReviews");
-      const unsubscribe = onSnapshot(reviewRef, (snapshot) => {
-        const reviewsData = snapshot.docs.map((doc) => doc.data());
-        setReviews(reviewsData);
-        setIsLoadingReviews(false);
-      });
+useEffect(() => {
+  if (id) {
+    fetchMovieById(id).then(setMovie);
+    fetchMovieVideos(id).then(setVideo);
 
-      return () => unsubscribe();
-    }
-  }, [id]);
+    const reviewRef = collection(db, "reviews", id, "userReviews");
+    const unsubscribe = onSnapshot(reviewRef, (snapshot) => {
+      const reviewsData = snapshot.docs.map((doc) => doc.data());
+      setReviews(reviewsData);
+    });
+
+    return () => unsubscribe();
+  }
+}, [id]);
 
   if (!movie) {
     return (
-      <section className="movie-detail">
-        <h1>
-          <Skeleton width={200} />
-        </h1>
-        <div className="movie-main">
-          <div className="movie-main_left">
-            <Skeleton height={450} width={300} />
-          </div>
-          <div className="movie-main_right">
-            <Skeleton height={300} width={500} />
-          </div>
-        </div>
-      </section>
+      <div className="container movie-loading">
+        <Skeleton height={500} />
+      </div>
     );
   }
 
   return (
     <>
       <NavBar />
-      <section className="movie-detail">
-        <h1>{movie.title}</h1>
-        <div className="movie-main">
-          <div className="movie-main_left">
+
+      {/* Hero Section */}
+      <div
+        className="movie-hero"
+        style={{
+          backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`,
+        }}
+      >
+        <div className="overlay">
+          <div className="movie-hero-content container">
             <img
-              className="movie_poster"
+              className="movie-poster"
               src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
-              alt=""
+              alt={movie.title}
             />
-            <div className="movie_left_movie_details">
-              <div className="movie_tags">
-                <div>
-                  {movie.genres?.map((genre) => {
-                    return (
-                      <span className="tag" key={genre.id}>
-                        {" "}
-                        {genre.name}
-                      </span>
-                    );
-                  })}
-                </div>
+            <div className="movie-info">
+              <h1>{movie.title}</h1>
+              {movie.tagline && <p className="tagline">“{movie.tagline}”</p>}
+              <p className="overview">{movie.overview}</p>
+              <div className="genres">
+                {movie.genres?.map((genre) => (
+                  <span key={genre.id} className="genre-tag">{genre.name}</span>
+                ))}
               </div>
-              <div className="movie_description">
-                <p>{movie.overview}</p>
-              </div>
-              <div className="rating">
-                <small>IMDB rating</small>
-                <br />
-                <small>{movie.vote_average}⭐/10</small>
-              </div>
+              <p className="rating">⭐ {movie.vote_average}/10</p>
             </div>
           </div>
-          <div className="movie-main_right">
-            {video.length > 0 ? (
-              <iframe
-                className="movie_backdrop"
-                width="500"
-                height="300"
-                src={`https://www.youtube.com/embed/${video[0].key}`}
-                title="YouTube trailer"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            ) : (
-              <p>No trailer available</p>
-            )}
-          </div>
         </div>
+      </div>
+
+      {/* Trailer Section */}
+      <section className="container trailer-section">
+        <h2>Trailer</h2>
+        {video.length > 0 ? (
+  <div className="video-grid">
+        {video.map((vid) => (
+          <div className="video-item" key={vid.id}>
+            <iframe
+              src={`https://www.youtube.com/embed/${vid.key}`}
+              title={vid.name}
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            ></iframe>
+            <p className="video-label">{vid.name}</p>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p>No media available.</p>
+    )}
       </section>
-      <section className="Review-section">
+
+      {/* Reviews */}
+      <section className="container">
+        <h2>Leave a Review</h2>
         <ReviewForm movieId={String(id)} />
-      </section>
-      <section className="reviews-section">
+      </section>    
+
+
+      <section className="container reviews-section">
         <h2>User Reviews</h2>
-        {isLoadingReviews ? (
-          <ul className="review-list">
-            {[...Array(3)].map((_, i) => (
-              <li key={i} className="review-item">
-                <div className="review-strong">
-                  <Skeleton circle width={30} height={30} />
-                  <Skeleton width={200} style={{ marginLeft: 10 }} />
-                </div>
-                <Skeleton count={2} />
-              </li>
-            ))}
-          </ul>
-        ) : reviews.length === 0 ? (
-          <p>No reviews yet. Be the first to review!</p>
+        {reviews.length === 0 ? (
+          <p>No reviews yet. Be the first to leave one!</p>
         ) : (
-          <ul className="review-list">
-            {reviews.map((review, index) => (
-              <li className="review-item" key={index}>
-                <div className="review-strong">
-                  <img
-                    style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 50,
-                      display: "inline-block",
-                    }}
-                    src={review?.avatar || default_img}
-                    alt=""
-                  />{" "}
-                  <p>
-                    <span style={{ fontSize: 24, fontWeight: 600 }}>
-                      {review.username}
-                    </span>{" "}
-                    rated it {review.rating}/10⭐{" "}
-                  </p>
-                </div>{" "}
-                <p>{review.review}</p>
-                {/* Only show if current user is the author */}
-                {user?.uid === review.userId && (
-                  <div style={{ marginTop: "0.5rem" }}>
-                    <>
-                      <button
-                        onClick={async () => {
-                          if (
-                            confirm(
-                              "Are you sure you want to delete this review?"
-                            )
-                          ) {
-                            await deleteDoc(
-                              doc(
-                                db,
-                                "reviews",
-                                id!,
-                                "userReviews",
-                                review.userId
-                              )
-                            );
-                            setReviews((prev) =>
-                              prev.filter((r) => r.userId !== review.userId)
-                            );
-                          }
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </>
+          <div className="review-list">
+            {reviews.map((review, i) => (
+              <div key={i} className="review-card">
+                <div className="review-header">
+                  <img src={review.avatar || default_img} alt="avatar" />
+                  <div>
+                    <strong>{review.username}</strong>
+                    <p className="user-rating">⭐ {review.rating}/10</p>
                   </div>
-                )}
-              </li>
+                </div>
+                <p className="review-text">{review.review}</p>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </section>
+ 
     </>
   );
 };

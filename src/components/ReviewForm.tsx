@@ -1,91 +1,64 @@
-// src/components/ReviewForm.tsx
 import { useState } from "react";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
+import { doc, setDoc } from "firebase/firestore";
 import { useAuth } from "../hooks/useAuth";
 import "./ReviewForm.css";
 
-interface ReviewFormProps {
+interface Props {
   movieId: string;
 }
 
-export function ReviewForm({ movieId }: ReviewFormProps) {
+export const ReviewForm: React.FC<Props> = ({ movieId }) => {
   const { user } = useAuth();
-  const [review, setReview] = useState("");
-  const [rating, setRating] = useState(0);
-  const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [rating, setRating] = useState<number>(10);
+  const [review, setReview] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
 
-    const trimmedReview = review.trim();
-    if (trimmedReview.length < 5) {
-      setError("please enter atleast 5 characters");
-      return;
-    }
-    if (isNaN(Number(rating)) || rating < 0 || rating > 10) {
-      setError("rating must be between 0 and 10 ");
-      return;
-    }
+    if (!user) return alert("Please log in to submit a review.");
+    if (review.trim().length === 0) return alert("Please write a review.");
 
-    setError("");
-    setSubmitting(true);
+    const reviewData = {
+      username: user.displayName || "Anonymous",
+      avatar: user.photoURL || "",
+      userId: user.uid,
+      rating,
+      review,
+    };
 
-    try {
-      await setDoc(doc(db, "reviews", movieId, "userReviews", user.uid), {
-        username: user.displayName,
-        review: review,
-        rating: Number(rating),
-        userId: user.uid,
-        avatar: user.photoURL,
-        timestamp: serverTimestamp(),
-      });
-      alert("Review submitted!");
-      setReview("");
-      setRating(0);
-    } catch (error) {
-      console.error("Error submitting review: ", error);
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    const reviewRef = doc(db, "reviews", movieId, "userReviews", user.uid);
+    await setDoc(reviewRef, reviewData);
+
+    setReview("");
+    setRating(10);
+    // alert("Review submitted!");
   };
 
   return (
-    <form onSubmit={handleSubmit} className="review-form">
-      <textarea
-        value={review}
-        onChange={(e) => setReview(e.target.value)}
-        placeholder="Write your review..."
-        required
-      />
-      {/* <input
-        type="number"
-        value={rating}
-        onChange={(e) => setRating(Number(e.target.value))}
-        placeholder="Rating (0-10)"
-        min={0}
-        max={10}
-        required
-      /> */}
-      <select
-        value={rating}
-        onChange={(e) => setRating(Number(e.target.value))}
-        required
-      >
-        <option value="">Select rating</option>
-        {[...Array(11)].map((_, i) => (
-          <option key={i} value={i}>
-            {i}
-          </option>
-        ))}
-      </select>
-      <button disabled={submitting} type="submit">
-        {submitting ? "submiting..." : "Submit Review"}
-      </button>
-      {error && <p className="error">{error}</p>}
+    <form className="review-form" onSubmit={handleSubmit}>
+      <label>
+        Your Rating:
+        <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+          {Array.from({ length: 10 }, (_, i) => 10 - i).map((num) => (
+            <option key={num} value={num}>
+              {num}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label>
+        Your Review:
+        <textarea
+          value={review}
+          onChange={(e) => setReview(e.target.value)}
+          rows={4}
+          placeholder="Write your thoughts..."
+        />
+      </label>
+
+      <button type="submit" className="submit-btn">Submit Review</button>
     </form>
   );
-}
+};
