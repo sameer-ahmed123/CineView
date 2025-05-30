@@ -181,3 +181,26 @@ h2 {
 .scroll-btn:hover {
   transform: scale(1.2);
 }
+
+
+
+@media  screen and (max-width:540px) {
+  .category-wrapper{
+    width: 510px;
+    padding: 0;
+  }
+}
+
+@media  screen and (max-width:431px) {
+  .category-wrapper{
+    width: 400px;
+    padding: 0;
+  }
+}
+
+@media  screen and (max-width:391px) {
+  .category-wrapper{
+    width: 350px;
+    padding: 0;
+  }
+}

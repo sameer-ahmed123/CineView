@@ -43,3 +43,11 @@
   border: 2px solid #5eead4;
   cursor: pointer;
 }
+
+
+@media screen and (max-width:540px) {
+  .navBar{
+    flex-direction: column;
+  }
+  
+}

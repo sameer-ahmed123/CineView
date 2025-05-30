@@ -37,9 +37,9 @@
     width: 380px;
   }
 }
-@media screen and (max-width: 541px) {
+@media screen and (max-width: 540px) {
   .search-bar input[type="text"] {
-    width: 380px;
+    width: 320px;
   }
 }
 
@@ -51,13 +51,13 @@
 
 @media screen and (max-width: 431px) {
   .search-bar input[type="text"] {
-    width: 270px;
+    width: 220px;
   }
 }
 
-@media screen and (max-width: 415px) {
+@media screen and (max-width: 414px) {
   .search-bar input[type="text"] {
-    width: 250px;
+    width: 190px;
   }
 }
 

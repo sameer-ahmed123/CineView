@@ -1,12 +1,12 @@
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = "https://api.themoviedb.org/3";
 
-export interface genres {
+export interface Genre {
   id: number;
   name: string;
 }
 
-export interface languages {
+export interface language {
   english_name: string;
   name: string;
 }
@@ -19,22 +19,36 @@ export interface Movie {
   overview: string;
   vote_average: number;
   release_date: string;
-  runtime: number;
-  homepage: string;
-  tagline: string;
-  genres: genres[];
-  languages: languages[];
+  runtime?: number;
+  homepage?: string;
+  tagline?: string;
+  genres?: Genre[];
+  languages: language[];
   original_language: string;
   adult: boolean;
 }
 
-export const fetchPopularMovies = async (page = 1): Promise<Movie[]> => {
+// Add a new interface for the API response structure
+export interface MovieApiResponse {
+  page: number;
+  results: Movie[];
+  total_pages: number;
+  total_results: number;
+}
+
+interface GenreListResponse {
+  genres: Genre[];
+}
+
+export const fetchPopularMovies = async (
+  page = 1
+): Promise<MovieApiResponse> => {
+  // Changed return type
   const res = await fetch(
     `${BASE_URL}/movie/popular?api_key=${API_KEY}&page=${page}`
   );
-  const data = await res.json();
-  // return data.results;
-  return data.results.slice(0, 30);
+  const data: MovieApiResponse = await res.json();
+  return data;
 };
 
 export const fetchMovieById = async (id: string): Promise<Movie> => {
@@ -45,13 +59,14 @@ export const fetchMovieById = async (id: string): Promise<Movie> => {
 export const searchMovies = async (
   query: string,
   page = 1
-): Promise<Movie[]> => {
+): Promise<MovieApiResponse> => {
   const res = await fetch(
     `${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(
       query
     )}&page=${page}&include_adult=false`
   );
-  const data = await res.json();
+  const data: MovieApiResponse = await res.json();
+
   const nsfwKeywords = [
     "pussy",
     "rubbing",
@@ -74,17 +89,19 @@ export const searchMovies = async (
     "人妻",
   ];
 
-  console.log(data.results);
+  // console.log(data.results);
   const filteredResults = data.results.filter((movie: Movie) => {
     const text = `${movie.title} ${movie.overview} `.toLocaleLowerCase();
     return (
       !movie.adult && !nsfwKeywords.some((keyword) => text.includes(keyword))
     );
   });
-  console.log(filteredResults);
+  // console.log(filteredResults);
 
-  return filteredResults.slice(0, 18);
-  // return data.results;
+  return {
+    ...data, // Include original page, total_pages, total_results
+    results: filteredResults, // Override results with filtered ones
+  };
 };
 
 export const fetchMovieVideos = async (movieId: string) => {
@@ -93,4 +110,59 @@ export const fetchMovieVideos = async (movieId: string) => {
   );
   const data = await response.json();
   return data.results; // array of videos
+};
+
+export const fetchMovieGenres = async (): Promise<Genre[]> => {
+  const res = await fetch(`${BASE_URL}/genre/movie/list?api_key=${API_KEY}`);
+  const data: GenreListResponse = await res.json();
+  return data.genres;
+};
+
+
+export const FetchMoviesByGenre = async (
+  genreId: number,
+  page = 1
+): Promise<MovieApiResponse> => {
+  const response = await fetch(
+    `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&page=${page}&sort_by=popularity.desc&include_adult=false`
+  );
+  const data: MovieApiResponse = await response.json();
+  // return data;
+
+  const nsfwKeywords = [
+    "pussy",
+    "rubbing",
+    "sex",
+    "ass",
+    "nude",
+    "nudity",
+    "hentai",
+    "softcore",
+    "xxx",
+    "fetish",
+    "mistress",
+    "incest",
+    "porno",
+    "adult",
+    "淫",
+    "乳",
+    "裸",
+    "淫乱",
+    "人妻",
+  ];
+
+  const filteredResults = data.results.filter((movie) => {
+    const text = `${movie.title} ${movie.overview}`.toLocaleLowerCase();
+    return (
+      !movie.adult &&
+      !nsfwKeywords.some((keyword) => {
+        text.includes(keyword);
+      })
+    );
+  });
+
+  return {
+    ...data,
+    results: filteredResults,
+  };
 };
