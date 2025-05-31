@@ -23,6 +23,7 @@ export interface Movie {
   homepage?: string;
   tagline?: string;
   genres?: Genre[];
+  genre_ids:number[];
   languages: language[];
   original_language: string;
   adult: boolean;
@@ -100,7 +101,6 @@ export const fetchMovieGenres = async (): Promise<Genre[]> => {
   return data.genres;
 };
 
-
 export const FetchMoviesByGenre = async (
   genreId: number,
   page = 1
@@ -118,10 +118,7 @@ export const FetchMoviesByGenre = async (
   const filteredResults = data.results.filter((movie) => {
     const text = `${movie.title} ${movie.overview}`.toLocaleLowerCase();
     return (
-      !movie.adult &&
-      !nsfwKeywords.some((keyword) => {
-        text.includes(keyword);
-      })
+      !movie.adult && !nsfwKeywords.some((keyword) => text.includes(keyword))
     );
   });
 
