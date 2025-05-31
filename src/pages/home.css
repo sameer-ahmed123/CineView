@@ -1,85 +1,23 @@
-.movie-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-  padding: 20px;
-  margin-top: 20px;
+/* Global Styles */
+* {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  font-family: sans-serif;
 }
 
 h2 {
   padding-left: 40px;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  color: #e0e0e0;
 }
 
-* {
-  user-select: none;
-}
-
-.pagination-buttons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 2rem 0;
-  gap: 1rem;
-}
-
-.pagination-buttons button {
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  background-color: #222;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.pagination-buttons button:hover {
-  background-color: #444;
-}
-
-.pagination-buttons button:disabled {
-  background-color: #999;
-  cursor: not-allowed;
-}
-
-@media screen and (max-width: 541px) {
-  h2 {
-    text-align: center;
-    padding: 0;
-  }
-  .movie-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 35px;
-  }
-}
-
-@media screen and (max-width: 431px) {
-  h2 {
-    text-align: center;
-    padding: 0;
-  }
-  .movie-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 35px;
-  }
-}
-
-@media screen and (max-width: 415px) {
-  h2 {
-    text-align: center;
-    padding: 0;
-  }
-  .movie-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 35px;
-  }
-}
-@media screen and (max-width: 376px) {
-  h2 {
-    text-align: center;
-    padding: 0;
-  }
-}
+/* Home Container */
 .home-container {
   width: 100%;
   max-width: 1200px;
@@ -87,46 +25,14 @@ h2 {
   padding: 20px;
 }
 
-.category-bar {
-  display: flex;
-  overflow-x: auto;
-  padding: 10px 40px;
-  gap: 10px;
-  overflow-x: scroll;
-}
-
-.category-bar::-webkit-scrollbar {
-  display: none;
-}
-
-.category-tab {
-  background-color: #2a2a40;
-  color: #ffffff;
-  border: none;
-  border-radius: 999px;
-  padding: 8px 16px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-}
-
-.category-tab:hover {
-  background-color: #5eead4;
-  color: #0f0f0f;
-  font-weight: 600;
-}
-.category-tab.active {
-  background-color: #5eead4;
-  color: #0f0f0f;
-  font-weight: 700;
-}
+/* Category Bar Styles */
 .category-wrapper {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 40px;
-  margin-bottom: 1rem;
+  padding: 0 20px;
+  margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 .category-bar {
@@ -135,6 +41,7 @@ h2 {
   gap: 10px;
   padding: 10px 0;
   scrollbar-width: none;
+  -ms-overflow-style: none;
   scroll-behavior: smooth;
   flex: 1;
 }
@@ -150,15 +57,15 @@ h2 {
   border-radius: 999px;
   padding: 8px 16px;
   font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, font-weight 0.2s ease;
 }
 
 .category-tab:hover {
   background-color: #5eead4;
   color: #0f0f0f;
-  font-weight: 600;
 }
 
 .category-tab.active {
@@ -173,7 +80,7 @@ h2 {
   color: #5eead4;
   font-size: 1.5rem;
   cursor: pointer;
-  padding: 0 10px;
+  padding: 0 5px;
   z-index: 2;
   transition: transform 0.2s ease;
 }
@@ -182,25 +89,136 @@ h2 {
   transform: scale(1.2);
 }
 
+/* Movie Grid Styles */
+.movie-grid {
+  display: grid;
+  /* Start with a more flexible minmax for wider compatibility */
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+  padding: 0 20px;
+}
 
+/* Pagination Styles */
+.pagination-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+  gap: 1rem;
+}
 
-@media  screen and (max-width:540px) {
-  .category-wrapper{
-    width: 510px;
-    padding: 0;
+.pagination-buttons button {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  background-color: #222;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+/*only hovers when the button inst disabled*/
+.pagination-buttons button:hover:not(:disabled) {
+  background-color: #444;
+  transform: translateY(-2px); /* Slight lift on hover */
+}
+
+.pagination-buttons button:disabled {
+  background-color: #555;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+/* --- Responsive --- */
+
+/* (tablets) */
+@media screen and (max-width: 768px) {
+  h2 {
+    font-size: 1.6rem;
+    padding-left: 20px;
+  }
+
+  .home-container {
+    padding: 15px;
+  }
+
+  .category-wrapper {
+    padding: 0 15px;
+  }
+
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+    padding: 0 15px;
+  }
+
+  .category-tab {
+    padding: 7px 14px;
+    font-size: 0.85rem;
+  }
+
+  .scroll-btn {
+    font-size: 1.3rem;
   }
 }
 
-@media  screen and (max-width:431px) {
-  .category-wrapper{
-    width: 400px;
-    padding: 0;
+/* (mobile phones) */
+@media screen and (max-width: 540px) {
+  h2 {
+    text-align: center;
+    padding: 0 10px;
+    font-size: 1.4rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .home-container {
+    padding: 10px;
+  }
+
+  .category-wrapper {
+    padding: 0 10px;
+  }
+  .category-bar {
+    padding: 8px 0;
+  }
+
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    padding: 0 10px; /* Reduce padding */
+  }
+
+  .category-tab {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  .pagination-buttons button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .scroll-btn {
+    display: none;
+  }
+
+  .category-bar {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 
-@media  screen and (max-width:391px) {
-  .category-wrapper{
-    width: 350px;
-    padding: 0;
+@media screen and (max-width: 375px) {
+  h2 {
+    font-size: 1.3rem;
+  }
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  .category-tab {
+    padding: 5px 10px;
+    font-size: 0.75rem;
   }
 }

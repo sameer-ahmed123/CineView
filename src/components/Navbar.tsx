@@ -3,11 +3,10 @@ import Search from "./Search";
 import { useAuth } from "../hooks/useAuth";
 import { Logout } from "./Logout";
 
+
 function NavBar() {
   const { user } = useAuth();
-  const default_img =
-    "https://static.vecteezy.com/system/resources/previews/053/547/120/large_2x/generic-user-profile-avatar-for-online-platforms-and-social-media-vector.jpg";
-
+  const default_img ="/default.jpg"
   return (
     <nav className="navBar">
       <a className="navBrand" href="/">
@@ -18,9 +17,9 @@ function NavBar() {
         <li>
           {user ? (
             <a href="/profile">
-              <img
+              <img className="profile_icon"
                 src={user.photoURL || default_img}
-                alt="Profile"
+                alt="pfp"
                 width={40}
                 height={40}
               />

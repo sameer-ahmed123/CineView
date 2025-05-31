@@ -99,8 +99,6 @@ const Home: React.FC = () => {
         }
         moviesToDisplay = searchedMovies;
         // WARNING: totalPages is for the original search (e.g., "cars"),
-        // not for the client-filtered results (e.g., "Action cars").
-        // This will make pagination less accurate for combined filters.
         setTotalPages(apiResponse.total_pages);
       }
     } else {
