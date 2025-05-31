@@ -23,7 +23,7 @@ export interface Movie {
   homepage?: string;
   tagline?: string;
   genres?: Genre[];
-  genre_ids:number[];
+  genre_ids: number[];
   languages: language[];
   original_language: string;
   adult: boolean;
@@ -68,9 +68,7 @@ export const searchMovies = async (
   );
   const data: MovieApiResponse = await res.json();
 
-  const nsfwKeywords = [
-    "pussy"
-  ];
+  const nsfwKeywords = ["pussy", "sex", "nude", "boobs", "panties", "ass"];
 
   // console.log(data.results);
   const filteredResults = data.results.filter((movie: Movie) => {
@@ -111,9 +109,7 @@ export const FetchMoviesByGenre = async (
   const data: MovieApiResponse = await response.json();
   // return data;
 
-  const nsfwKeywords = [
-    "pussy"
-  ];
+  const nsfwKeywords = ["pussy", "sex", "nude", "boobs", "panties", "ass"];
 
   const filteredResults = data.results.filter((movie) => {
     const text = `${movie.title} ${movie.overview}`.toLocaleLowerCase();
