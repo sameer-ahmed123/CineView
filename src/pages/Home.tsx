@@ -112,7 +112,7 @@
 //     });
 //     setTotalPages(response.total_pages);
 //     setIsLoading(false);
-//   }, [currentQuery, currentPage, activeCategory, genreNameToIdMap]); 
+//   }, [currentQuery, currentPage, activeCategory, genreNameToIdMap]);
 
 //   // Effect for initial load and when query/page/category changes
 //   useEffect(() => {
@@ -159,7 +159,7 @@
 //   // Handler for category tab click
 //   const handleCategoryClick = (genreName: string) => {
 //     if (activeCategory === genreName) return; // Prevent re-fetching if same category clicked
-    
+
 //     setSearchParams(prevParams => {
 //       const newParams = new URLSearchParams(prevParams);
 //       newParams.delete('search');
@@ -289,8 +289,6 @@
 
 // export default Home;
 
-
-
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import {
   fetchPopularMovies,
@@ -314,8 +312,12 @@ const Home: React.FC = () => {
   // Initialize state from URL search parameters
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setIsLoading] = useState(true);
-  const [currentQuery, setCurrentQuery] = useState(searchParams.get("search") || "");
-  const [activeCategory, setActiveCategory] = useState(searchParams.get("genre") || "Popular");
+  const [currentQuery, setCurrentQuery] = useState(
+    searchParams.get("search") || ""
+  );
+  const [activeCategory, setActiveCategory] = useState(
+    searchParams.get("genre") || "Popular"
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -343,7 +345,8 @@ const Home: React.FC = () => {
         console.error("Error fetching genres:", error);
         // Fallback list (as in your original code)
         setGenres([
-          { id: 0, name: "Popular" }, { id: 28, name: "Action" }, /* ... other fallback genres */
+          { id: 0, name: "Popular" },
+          { id: 28, name: "Action" } /* ... other fallback genres */,
         ]);
       }
     };
@@ -370,7 +373,10 @@ const Home: React.FC = () => {
     let apiResponse: MovieApiResponse | null = null;
     let moviesToDisplay: Movie[] = [];
 
-    const genreIdForClientFilter = activeCategory !== "Popular" ? genreNameToIdMap.get(activeCategory) : undefined;
+    const genreIdForClientFilter =
+      activeCategory !== "Popular"
+        ? genreNameToIdMap.get(activeCategory)
+        : undefined;
 
     if (currentQuery.trim() !== "") {
       // 1. A search query is active
@@ -379,8 +385,10 @@ const Home: React.FC = () => {
         let searchedMovies = apiResponse.results;
         // 2. If a specific genre is also active, filter the search results client-side
         if (genreIdForClientFilter) {
-          searchedMovies = searchedMovies.filter(movie =>
-            movie.genre_ids && movie.genre_ids.includes(genreIdForClientFilter)
+          searchedMovies = searchedMovies.filter(
+            (movie) =>
+              movie.genre_ids &&
+              movie.genre_ids.includes(genreIdForClientFilter)
           );
         }
         moviesToDisplay = searchedMovies;
@@ -395,7 +403,10 @@ const Home: React.FC = () => {
         apiResponse = await fetchPopularMovies(currentPage);
       } else {
         // genreIdForClientFilter should be valid here
-        apiResponse = await FetchMoviesByGenre(genreIdForClientFilter, currentPage);
+        apiResponse = await FetchMoviesByGenre(
+          genreIdForClientFilter,
+          currentPage
+        );
       }
       if (apiResponse) {
         moviesToDisplay = apiResponse.results;
@@ -409,7 +420,10 @@ const Home: React.FC = () => {
       } else {
         // Append new unique movies if loading more
         const newUniqueMovies = moviesToDisplay.filter(
-          (newMovie) => !prevMovies.some((existingMovie) => existingMovie.id === newMovie.id)
+          (newMovie) =>
+            !prevMovies.some(
+              (existingMovie) => existingMovie.id === newMovie.id
+            )
         );
         return [...prevMovies, ...newUniqueMovies];
       }
@@ -421,7 +435,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     // Only fetch if genres have been loaded (so genreNameToIdMap is ready)
     if (genres.length > 0) {
-        fetchMoviesData();
+      fetchMoviesData();
     }
   }, [fetchMoviesData, genres.length]); // Re-run if fetchMoviesData function instance changes or genres are loaded
 
@@ -436,30 +450,58 @@ const Home: React.FC = () => {
 
     // Update URL search parameters to reflect the new genre selection
     // The useEffect listening to searchParams will then handle state updates and trigger data fetching.
-    setSearchParams(prevParams => {
-      const newParams = new URLSearchParams(prevParams); // Preserve existing params (like 'search')
-      if (genreName === "Popular" || !genreName) {
-        newParams.delete('genre');
-      } else {
-        newParams.set('genre', genreName);
-      }
-      return newParams;
-    }, { replace: true }); // Use replace to avoid polluting browser history
+    setSearchParams(
+      (prevParams) => {
+        const newParams = new URLSearchParams(prevParams); // Preserve existing params (like 'search')
+        if (genreName === "Popular" || !genreName) {
+          newParams.delete("genre");
+        } else {
+          newParams.set("genre", genreName);
+        }
+        return newParams;
+      },
+      { replace: true }
+    ); // Use replace to avoid polluting browser history
   };
 
+  const scrollCategory = (direction: "left" | "right") => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = direction === "left" ? -200 : 200;
+      categoryScrollRef.current.scrollBy({
+        left: scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+  // Mouse drag handlers (unchanged)
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!categoryScrollRef.current) return;
+    isDown.current = true;
+    startX.current = e.pageX - categoryScrollRef.current.offsetLeft;
+    scrollLeft.current = categoryScrollRef.current.scrollLeft;
+  };
+
+  const handleMouseLeave = () => {
+    isDown.current = false;
+  };
+
+  const handleMouseUp = () => {
+    isDown.current = false;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDown.current || !categoryScrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - categoryScrollRef.current.offsetLeft;
+    const walk = (x - startX.current) * 1.5; // scroll speed
+    categoryScrollRef.current.scrollLeft = scrollLeft.current - walk;
+  };
   // Handler for "Load More" button
   const handleLoadMore = () => {
     if (currentPage < totalPages) {
       setCurrentPage((prevPage) => prevPage + 1);
     }
   };
-
-  // Mouse drag handlers for category bar (as in your original code)
-  const handleMouseDown = (e: React.MouseEvent) => { /* ... */ };
-  const handleMouseLeave = () => { /* ... */ };
-  const handleMouseUp = () => { /* ... */ };
-  const handleMouseMove = (e: React.MouseEvent) => { /* ... */ };
-  const scrollCategory = (direction: "left" | "right") => { /* ... */ };
 
   return (
     <>
@@ -469,7 +511,12 @@ const Home: React.FC = () => {
 
         <div className="category-wrapper">
           {/* Scroll buttons and category bar JSX as in your original code */}
-          <button className="scroll-btn left" onClick={() => scrollCategory("left")}>◀</button>
+          <button
+            className="scroll-btn left"
+            onClick={() => scrollCategory("left")}
+          >
+            ◀
+          </button>
           <div
             className="category-bar"
             ref={categoryScrollRef}
@@ -481,14 +528,21 @@ const Home: React.FC = () => {
             {genres.map((genre) => (
               <button
                 key={genre.id}
-                className={`category-tab ${activeCategory === genre.name ? "active" : ""}`}
+                className={`category-tab ${
+                  activeCategory === genre.name ? "active" : ""
+                }`}
                 onClick={() => handleCategoryClick(genre.name)}
               >
                 {genre.name}
               </button>
             ))}
           </div>
-          <button className="scroll-btn right" onClick={() => scrollCategory("right")}>▶</button>
+          <button
+            className="scroll-btn right"
+            onClick={() => scrollCategory("right")}
+          >
+            ▶
+          </button>
         </div>
 
         <div className="movie-grid">
@@ -505,17 +559,18 @@ const Home: React.FC = () => {
             movies.map((movie) => <MovieCard key={movie.id} movie={movie} />)
           ) : !loading ? (
             <p className="no-results">
-              No movies found for this selection. (Please note: genre filters on search results might reduce movie count significantly).
+              No movies found for this selection. (Please note: genre filters on
+              search results might reduce movie count significantly).
             </p>
           ) : null}
-          {loading && movies.length > 0 && ( // Skeletons for "Load More"
+          {loading &&
+            movies.length > 0 && // Skeletons for "Load More"
             [...Array(5)].map((_, i) => (
               <div key={`loading-${i}`} className="movie-card">
                 <Skeleton height={450} width={300} />
                 <Skeleton width={280} height={24} style={{ marginTop: 10 }} />
               </div>
-            ))
-          )}
+            ))}
         </div>
 
         <div className="pagination-buttons">
@@ -525,7 +580,9 @@ const Home: React.FC = () => {
             </button>
           )}
           {currentPage >= totalPages && !loading && movies.length > 0 && (
-            <p>You've reached the end of the movie list for the current criteria.</p>
+            <p>
+              You've reached the end of the movie list for the current criteria.
+            </p>
           )}
         </div>
       </div>
