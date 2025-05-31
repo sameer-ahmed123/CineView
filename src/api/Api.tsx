@@ -68,25 +68,7 @@ export const searchMovies = async (
   const data: MovieApiResponse = await res.json();
 
   const nsfwKeywords = [
-    "pussy",
-    "rubbing",
-    "sex",
-    "ass",
-    "nude",
-    "nudity",
-    "hentai",
-    "softcore",
-    "xxx",
-    "fetish",
-    "mistress",
-    "incest",
-    "porno",
-    "adult",
-    "淫",
-    "乳",
-    "裸",
-    "淫乱",
-    "人妻",
+    "pussy"
   ];
 
   // console.log(data.results);
@@ -130,25 +112,7 @@ export const FetchMoviesByGenre = async (
   // return data;
 
   const nsfwKeywords = [
-    "pussy",
-    "rubbing",
-    "sex",
-    "ass",
-    "nude",
-    "nudity",
-    "hentai",
-    "softcore",
-    "xxx",
-    "fetish",
-    "mistress",
-    "incest",
-    "porno",
-    "adult",
-    "淫",
-    "乳",
-    "裸",
-    "淫乱",
-    "人妻",
+    "pussy"
   ];
 
   const filteredResults = data.results.filter((movie) => {

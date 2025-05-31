@@ -77,64 +77,75 @@ const Home: React.FC = () => {
     getGenres();
   }, []); // Empty dependency means this runs only once on mount
 
-  const fetchMoviesData = useCallback(async () => {
-    setIsLoading(true);
-    let response: MovieApiResponse;
+const fetchMoviesData = useCallback(async () => {
+  setIsLoading(true);
+  let response: MovieApiResponse;
 
-    if (currentQuery.trim() !== "") {
-      response = await searchMovies(currentQuery, currentPage);
-    } else if (activeCategory === "Popular") {
-      response = await fetchPopularMovies(currentPage);
-    } else {
+  // Always start with search if query is provided
+  if (currentQuery.trim() !== "") {
+    const searchResults = await searchMovies(currentQuery, currentPage);
+
+    // Filter by genre if a non-"Popular" category is selected
+    if (activeCategory !== "Popular") {
       const genreId = genreNameToIdMap.get(activeCategory);
       if (genreId) {
-        response = await FetchMoviesByGenre(genreId, currentPage);
+        response = {
+          ...searchResults,
+          results: searchResults.results.filter((movie) =>
+            movie.genre_ids?.includes(genreId)
+          ),
+        };
       } else {
-        console.warn(`Genre ID not found for category: ${activeCategory}`);
-        response = { page: 1, results: [], total_pages: 1, total_results: 0 };
+        response = searchResults;
       }
+    } else {
+      response = searchResults;
     }
+  } else if (activeCategory === "Popular") {
+    response = await fetchPopularMovies(currentPage);
+  } else {
+    const genreId = genreNameToIdMap.get(activeCategory);
+    if (genreId) {
+      response = await FetchMoviesByGenre(genreId, currentPage);
+    } else {
+      console.warn(`Genre ID not found for category: ${activeCategory}`);
+      response = { page: 1, results: [], total_pages: 1, total_results: 0 };
+    }
+  }
 
-    setMovies((prevMovies) => {
-      if (currentPage === 1) {
-        // If it's the first page, just replace the movies
-        return response.results;
-      } else {
-        // If loading more, filter out duplicates before appending
-        const newMovies = response.results.filter(
-          (newMovie) =>
-            !prevMovies.some(
-              (existingMovie) => existingMovie.id === newMovie.id
-            )
-        );
-        return [...prevMovies, ...newMovies];
-      }
-    });
-    setTotalPages(response.total_pages);
-    setIsLoading(false);
-  }, [currentQuery, currentPage, activeCategory, genreNameToIdMap]); 
+  // Append or replace movie list
+  setMovies((prevMovies) => {
+    if (currentPage === 1) return response.results;
+    const newMovies = response.results.filter(
+      (newMovie) => !prevMovies.some((m) => m.id === newMovie.id)
+    );
+    return [...prevMovies, ...newMovies];
+  });
+
+  setTotalPages(response.total_pages);
+  setIsLoading(false);
+}, [currentQuery, currentPage, activeCategory, genreNameToIdMap]);
+
 
   // Effect for initial load and when query/page/category changes
-  useEffect(() => {
-    // Priority 1: If URL search query changes, reset everything for a new search
-    if (initialQuery !== currentQuery) {
-      setCurrentQuery(initialQuery);
-      setCurrentPage(1);
-      setMovies([]);
-      setActiveCategory("Popular");
-    } else if (currentPage === 1 && movies.length === 0 && !loading) {
-      // safety net for initial load if movies are empty and not already loading.
-      // Or if a new category/search resulted in no movies.
-    }
-    fetchMoviesData();
-  }, [
-    initialQuery,
-    currentPage,
-    activeCategory,
-    fetchMoviesData,
-    movies.length,
-    loading,
-  ]); // Added activeCategory to dependencies
+useEffect(() => {
+  if (initialQuery !== currentQuery) {
+    // New search input from URL
+    setCurrentQuery(initialQuery);
+    setActiveCategory("Popular"); // search should reset category to default
+    setCurrentPage(1);
+    setMovies([]);
+  }
+
+  fetchMoviesData();
+}, [
+  initialQuery,
+  currentPage,
+  activeCategory,
+  fetchMoviesData,
+]);
+
+// Added activeCategory to dependencies
   // Added movies.length and loading to ensure the effect re-evaluates if initial empty state remains.
 
   // Handler for "Load More" button
