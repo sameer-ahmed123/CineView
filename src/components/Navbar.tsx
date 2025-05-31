@@ -6,7 +6,7 @@ import { Logout } from "./Logout";
 function NavBar() {
   const { user } = useAuth();
   const default_img =
-    "https://www.pngall.com/wp-content/uploads/5/Avatar-Profile-PNG-Clipart.png";
+    "https://static.vecteezy.com/system/resources/previews/053/547/120/large_2x/generic-user-profile-avatar-for-online-platforms-and-social-media-vector.jpg";
 
   return (
     <nav className="navBar">
