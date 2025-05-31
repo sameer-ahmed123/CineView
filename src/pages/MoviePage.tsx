@@ -10,10 +10,17 @@ import { db } from "../firebase";
 
 const MoviePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const default_img = "https://www.vectorstock.com/royalty-free-vector/default-profile-picture-avatar-user-icon-vector-46389216";
+  const default_img = "https://static.vecteezy.com/system/resources/previews/053/547/120/large_2x/generic-user-profile-avatar-for-online-platforms-and-social-media-vector.jpg";
   const [movie, setMovie] = useState<Movie | null>(null);
   const [video, setVideo] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [modalVideoKey, setModalVideoKey] = useState<string | null>(null);
+  const [showAllMedia, setShowAllMedia] = useState(false);
+  const trailer = video.find(
+  (v) => v.type === "Trailer" && v.site === "YouTube"
+);
+
+
   // const trailers = video.filter(v => v.type === "Trailer");
   // const clips = video.filter(v => v.type === "Clip");
 
@@ -69,28 +76,63 @@ useEffect(() => {
                 ))}
               </div>
               <p className="rating">⭐ {movie.vote_average}/10</p>
+              {trailer && (
+                <button className="watch-trailer-btn" onClick={() => setModalVideoKey(trailer.key)}>
+                  🎬 Watch Trailer
+                </button>
+              )}
+
             </div>
           </div>
         </div>
       </div>
-
-      {/* Trailer Section */}
-      <section className="container trailer-section">
-        <h2>Trailer</h2>
-        {video.length > 0 ? (
-  <div className="video-grid">
-        {video.map((vid) => (
-          <div className="video-item" key={vid.id}>
+      {modalVideoKey && (
+        <div className="trailer-modal" onClick={() => setModalVideoKey(null)}>
+          <div className="trailer-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-btn" onClick={() => setModalVideoKey(null)}>×</button>
             <iframe
-              src={`https://www.youtube.com/embed/${vid.key}`}
-              title={vid.name}
+              src={`https://www.youtube.com/embed/${modalVideoKey}?autoplay=1`}
+              title="Movie Video"
               allow="autoplay; encrypted-media"
               allowFullScreen
             ></iframe>
-            <p className="video-label">{vid.name}</p>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
+      {/* Trailer Section */}
+      <section className="container trailer-section">
+        {/* heading and load more button for media */}
+        <div className="media-header">
+          <h2>Media</h2>
+          {video.length > 6 && (
+            <button
+              className="view-all-btn"
+              onClick={() => setShowAllMedia(!showAllMedia)}
+            >
+              {showAllMedia ? "Hide Media" : "View All Media"}
+            </button>
+          )}
+        </div>
+
+        {video.length > 0 ? (
+      <div className="video-grid limited">
+      {(showAllMedia ? video : video.slice(0, 6)).map((vid) => (
+        <div
+            className="video-item"
+            key={vid.id}
+            onClick={() => setModalVideoKey(vid.key)}
+          >
+          <iframe
+            src={`https://www.youtube.com/embed/${vid.key}`}
+            title={vid.name}
+            allow="autoplay; encrypted-media"
+            allowFullScreen
+          ></iframe>
+          <p className="video-label">{vid.name}</p>
+        </div>
+      ))}
+    </div>
+
     ) : (
       <p>No media available.</p>
     )}
